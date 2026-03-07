@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>امتحان CSS - الحصتان الأولى والثانية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-badge">📚 مادة تصميم الويب</div>
+    <h1>امتحان CSS</h1>
+    <p>الحصتان الأولى والثانية — طرق الربط، Box Model، الألوان، الخطوط، النصوص</p>
+    <div class="exam-meta">
+      <span class="meta-pill">⏱ 90 دقيقة</span>
+      <span class="meta-pill">💯 100 درجة</span>
+      <span class="meta-pill">📝 40 سؤال</span>
+    </div>
+  </header>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-info">
+      <span id="prog-text">لم تجب على أي سؤال بعد</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill"></div>
+    </div>
+  </div>
+
+  <main>
+
+    <div class="section-header">
+      <div class="section-icon mcq">🎯</div>
+      <div class="section-title">
+        <h2>أولاً: أسئلة الاختيار من متعدد</h2>
+        <p>30 سؤال — درجة لكل إجابة صحيحة (الإجمالي = 45 درجة)</p>
+      </div>
+    </div>
+
+    <div id="mcq-container"></div>
+
+    <div class="section-header">
+      <div class="section-icon essay">✍️</div>
+      <div class="section-title">
+        <h2>ثانياً: الأسئلة المقالية</h2>
+        <p>10 أسئلة — اشرح بالتفصيل (الإجمالي = 55 درجة)</p>
+      </div>
+    </div>
+
+    <div id="essay-container"></div>
+
+    <div class="submit-zone">
+      <h3>🚀 إرسال الامتحان</h3>
+      <p>أدخل بياناتك ثم اضغط إرسال — ستُحسب نتيجتك فوراً وتُرسل  عبر واتساب</p>
+      <div class="student-input-row">
+        <div class="input-group">
+          <label>👤 اسمك الكامل</label>
+          <input type="text" id="student-name" >
+        </div>
+      </div>
+      <button class="btn-send" onclick="submitExam()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.559 4.122 1.532 5.859L0 24l6.335-1.54A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.015-1.374l-.36-.213-3.76.915.948-3.658-.234-.376A9.818 9.818 0 1112 21.818z"/>
+        </svg>
+ إرسال عبر واتساب
+      </button>
+      <div id="result-banner"></div>
+    </div>
+
+  </main>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
