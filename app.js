@@ -1,6 +1,7 @@
 const letters = ['أ', 'ب', 'ج', 'د'];
 const userAnswers = new Array(mcqData.length).fill(null);
 
+// ===== RENDER MCQ =====
 const mcqContainer = document.getElementById('mcq-container');
 
 mcqData.forEach((item, qi) => {
@@ -8,11 +9,16 @@ mcqData.forEach((item, qi) => {
   card.className = 'question-card';
   card.id = `q-${qi}`;
 
+  const codeBlock = item.code
+    ? `<div class="code-snippet">${item.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`
+    : '';
+
   card.innerHTML = `
     <div class="q-header">
       <div class="q-num">${qi + 1}</div>
       <div class="q-text">${item.q}</div>
     </div>
+    ${codeBlock}
     <div class="q-options">
       ${item.opts.map((opt, oi) => `
         <label class="option-label" id="opt-${qi}-${oi}" onclick="selectOption(${qi}, ${oi})">
@@ -50,7 +56,7 @@ essayData.forEach((item, ei) => {
   essayContainer.appendChild(card);
 });
 
-
+// ===== SELECT OPTION =====
 function selectOption(qi, oi) {
   userAnswers[qi] = oi;
 
@@ -58,7 +64,6 @@ function selectOption(qi, oi) {
     const el = document.getElementById(`opt-${qi}-${i}`);
     if (el) el.classList.remove('selected');
   }
-
   const selected = document.getElementById(`opt-${qi}-${oi}`);
   if (selected) selected.classList.add('selected');
 
@@ -68,14 +73,14 @@ function selectOption(qi, oi) {
   updateProgress();
 }
 
-
+// ===== PROGRESS =====
 function updateProgress() {
   const answered = userAnswers.filter(a => a !== null).length;
-  const total = mcqData.length;
-  const pct = Math.round((answered / total) * 100);
+  const total    = mcqData.length;
+  const pct      = Math.round((answered / total) * 100);
 
   document.getElementById('prog-fill').style.width = pct + '%';
-  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-pct').textContent  = pct + '%';
   document.getElementById('prog-text').textContent =
     answered === 0
       ? 'لم تجب على أي سؤال بعد'
@@ -90,67 +95,53 @@ function submitExam() {
     return;
   }
 
-  // Score MCQ
-  let correct = 0;
+  // ---- Build MCQ answers text (no scoring shown to student) ----
+  let mcqText = '';
   mcqData.forEach((item, qi) => {
     const ua = userAnswers[qi];
-    for (let i = 0; i < 4; i++) {
-      const el = document.getElementById(`opt-${qi}-${i}`);
-      if (!el) continue;
-      el.classList.remove('selected', 'correct', 'wrong');
-      if (i === item.ans) {
-        el.classList.add('correct');
-      } else if (ua === i && ua !== item.ans) {
-        el.classList.add('wrong');
-      }
-    }
-    if (ua === item.ans) correct++;
+    const chosenText = ua !== null
+      ? `${letters[ua]}) ${item.opts[ua]}`
+      : '⬜ لم يجب';
+    mcqText += `\nس${qi + 1}: ${item.q.substring(0, 50)}...\n   ← ${chosenText}\n`;
   });
 
-  const unanswered = userAnswers.filter(a => a === null).length;
-  const mcqScore = (correct * 1.5).toFixed(1);
-
-  // Collect essay answers
+  // ---- Build essay answers text ----
   let essayText = '';
   essayData.forEach((item, ei) => {
     const ans = document.getElementById(`essay-${ei}`).value.trim();
-    if (ans) {
-      essayText += `\n📌 سؤال ${ei + 1}: ${ans.substring(0, 80)}${ans.length > 80 ? '...' : ''}`;
-    }
+    essayText += `\nس${ei + 1} [${item.marks}د]: ${item.q.substring(0, 60)}...\n   ← ${ans || '(لم يُكتب إجابة)'}\n`;
   });
 
-  // Show result banner
-  const banner = document.getElementById('result-banner');
-  const level = correct >= 21 ? 'good' : correct >= 12 ? 'medium' : 'low';
-  const emoji  = correct >= 21 ? '🎉' : correct >= 12 ? '💪' : '📚';
-  const color  = correct >= 21 ? '#16a34a' : correct >= 12 ? '#ca8a04' : '#dc2626';
-
-  banner.className = 'show ' + level;
-  banner.innerHTML = `
-    <div class="result-score" style="color:${color}">${correct}/30</div>
-    <div class="result-label">
-      ${emoji} درجة MCQ: ${mcqScore}/45 — إجابات صحيحة: ${correct} | خاطئة: ${30 - correct - unanswered} | لم تجب: ${unanswered}
-    </div>
-  `;
-
-  // Build WhatsApp message
+  // ---- WhatsApp message ----
   const msg =
-    `🎓 *امتحان CSS - الحصتان الأولى والثانية*\n` +
+    `🎓 *امتحان CSS — الحصة الرابعة*\n` +
     `━━━━━━━━━━━━━━━━\n` +
     `👤 الاسم: ${name}\n` +
+    `📅 التاريخ: ${new Date().toLocaleString('ar-EG')}\n` +
     `━━━━━━━━━━━━━━━━\n` +
-    `📊 *نتيجة MCQ:*\n` +
-    `✅ إجابات صحيحة: ${correct} / 30\n` +
-    `❌ إجابات خاطئة: ${30 - correct - unanswered}\n` +
-    `⬜ لم يجب عليها: ${unanswered}\n` +
-    `📈 درجة MCQ: ${mcqScore} / 45\n` +
+    `🎯 *إجابات الاختيار من متعدد:*\n` +
+    mcqText +
     `━━━━━━━━━━━━━━━━\n` +
-    `✍️ *ملخص الأسئلة المقالية:*${essayText || '\n(لم تُكتب إجابات)'}\n` +
-    `━━━━━━━━━━━━━━━━\n` +
-    `📅 وقت الإرسال: ${new Date().toLocaleString('ar-EG')}`;
+    `✍️ *إجابات الأسئلة المقالية:*\n` +
+    essayText +
+    `━━━━━━━━━━━━━━━━`;
 
   const phone = '201099529496';
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
 
-  banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // ---- Show confirm (NO score reveal) ----
+  const confirm = document.getElementById('sent-confirm');
+  confirm.innerHTML = `
+    <div class="confirm-icon">✅</div>
+    <h4>تم إرسال إجاباتك!</h4>
+    <p>وصلت إجاباتك للمدرس وهيراجعها ويرد عليك بالنتيجة 🎯</p>
+  `;
+  confirm.classList.add('show');
+
+  // Disable button to prevent double send
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<span>✅ تم الإرسال</span>`;
+
+  confirm.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
